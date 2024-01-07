@@ -32,6 +32,7 @@ public class ItemManager : MonoBehaviour
                     if (item.TryGetComponent<Rigidbody>(out Rigidbody rb))
                     {
                         rb.useGravity = false;
+                        rb.detectCollisions = false;
                     }
                     Items.Add(item);
                     item.transform.SetParent(hand.transform, true);
