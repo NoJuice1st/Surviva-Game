@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,6 +11,10 @@ public class ItemManager : MonoBehaviour
     public Transform hand;
     public List<GameObject> Items;
     public int maxItems = 4;
+
+    private void Update() {
+        Drop();
+    }
 
     void FixedUpdate()
     {
@@ -33,8 +38,9 @@ public class ItemManager : MonoBehaviour
                     {
                         rb.useGravity = false;
                         rb.detectCollisions = false;
+                        rb.isKinematic = true;
                     }
-                    Items.Add(item);
+                    Items.Insert(0, item);
                     item.transform.SetParent(hand.transform, true);
                     item.transform.position = hand.transform.position;
 
@@ -43,20 +49,29 @@ public class ItemManager : MonoBehaviour
                 {   //swap Item in Hand
 
                 }
-
-
-                print("Item");
             }
-
         }
-        //Drop
-        if (Input.GetKey(KeyCode.Q) && Physics.Raycast(transform.position, forward, out hit, pickUpDistance))
+    }
+
+    private void Drop()
+    {
+        Vector3 forward = transform.forward;
+
+        if (Input.GetKey(KeyCode.Q))
         {
             if (Items.Count > 0)
             {
+                print(Items.Count);
                 GameObject item = Items[0];
-                item.transform.SetParent(null);
                 Items.RemoveAt(0);
+                if (item.TryGetComponent<Rigidbody>(out Rigidbody rb))
+                {
+                    rb.useGravity = true;
+                    rb.detectCollisions = true;
+                    rb.isKinematic = false;
+                    rb.AddForce(forward * 100);
+                }
+                item.transform.SetParent(null);
             }
         }
     }
