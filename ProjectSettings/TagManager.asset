@@ -7,6 +7,9 @@ TagManager:
   - Pickable
   - Destructable
   - Enemy
+  - Tool
+  - Tree
+  - Rock
   layers:
   - Default
   - TransparentFX

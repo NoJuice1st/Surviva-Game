@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class SaleManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public float currency;
+
+    private void OnCollisionEnter(Collision other) 
     {
-        
+        if(other.gameObject.TryGetComponent<Item>(out Item item))
+        {
+            currency += item.itemValue;    
+        }
+
+        Destroy(other.gameObject);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update() 
     {
-        
+        print(currency);
     }
 }
