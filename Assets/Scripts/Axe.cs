@@ -4,16 +4,11 @@ using UnityEngine;
 
 public class Axe : MonoBehaviour
 {
-    public int durability;
+    public Tool tool;
 
     public void Swing()
     {
         // play swing Animation
         print("swing");
-    }
-
-    public void DamageTool()
-    {
-        durability--;
     }
 }
