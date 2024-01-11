@@ -6,10 +6,11 @@ using UnityEngine;
 public class Interactions : MonoBehaviour
 {
     public float pickUpDistance = 10f;
-    public float interactDistance = 5f;
+    public float interactDistance = 1f;
+    public int selecItem = 0;
+
     public Transform hand;
     public Inventory inv;
-    public int selecItem = 0;
     Vector3 forward;
 
     private void Update()
@@ -83,12 +84,10 @@ public class Interactions : MonoBehaviour
 
     private void Drop()
     {
-        bool isCooldown = false;
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            if (!inv.isEmpty() && !isCooldown)
+            if (!inv.isEmpty())
             {
-                isCooldown = true;
                 GameObject item = inv.GetItem(selecItem);
 
                 // if Tool Remove Inventory, make sure the tool belongs to no one
@@ -104,16 +103,14 @@ public class Interactions : MonoBehaviour
                 UpdateHeldItem();
 
                 item.SetActive(true);
+                item.transform.SetParent(null);
                 if (item.TryGetComponent<Rigidbody>(out Rigidbody rb))
                 {
                     rb.useGravity = true;
                     rb.detectCollisions = true;
                     rb.isKinematic = false;
                     rb.AddForce(forward.normalized * 10, ForceMode.Impulse);
-                    item.transform.SetParent(null);
                 }
-
-                isCooldown = false;
             }
         }
     }
@@ -170,13 +167,9 @@ public class Interactions : MonoBehaviour
                 //Get which tool hit
                 if (item.TryGetComponent<Axe>(out Axe axe))
                 {
-                    if (hit.transform.gameObject.CompareTag("Tree"))
-                    {
-                        Destructable tree = hit.transform.gameObject.GetComponent<Destructable>();
-                        tree.TakeDamage();
-                    }
-                    axe.Swing();
+                    axe.useTool(hit);
                 }
+
                 tool.DamageTool();
 
                 //Used Tool

@@ -6,6 +6,7 @@ using TMPro;
 public class InventoryUI : MonoBehaviour
 {
     public Inventory inv;
+    //public GameObject[] Slots = new GameObject[4];
     public TMP_Text text;
 
     // Update is called once per frame
@@ -14,7 +15,7 @@ public class InventoryUI : MonoBehaviour
         string invItems = "";
         foreach (var item in inv.GetAllItems())
         {
-            invItems += item.name + "\n";
+            invItems += item.GetComponent<Item>().itemName + "\n";
         }
         text.text = "Inventory: \n" + invItems;
     }
