@@ -11,11 +11,13 @@ public class Interactions : MonoBehaviour
 
     public Transform hand;
     public Inventory inv;
+
     Vector3 forward;
 
     private void Update()
     {
         forward = transform.forward;
+
         Drop();
         Interact();
         PickUpp();
@@ -25,14 +27,9 @@ public class Interactions : MonoBehaviour
         {
             selecItem += (int)Math.Round(Input.mouseScrollDelta.y);
             UpdateHeldItem();
-            //print(selecItem);
         }
-    }
 
-    /*void FixedUpdate()
-    {
-        //PickUpp();
-    }*/
+    }
     private void PickUpp()
     {
         RaycastHit hit;
@@ -70,6 +67,7 @@ public class Interactions : MonoBehaviour
                         rb.detectCollisions = true;
                         rb.isKinematic = false;
 
+                        // switch spots
                         selItem.transform.position = item.transform.position;
                         selItem.transform.rotation = item.transform.rotation;
 
@@ -84,34 +82,34 @@ public class Interactions : MonoBehaviour
 
     private void Drop()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q) && !inv.isEmpty())
         {
-            if (!inv.isEmpty())
+            GameObject item = inv.GetItem(selecItem);
+
+            // if Tool, Remove from Inventory, make sure the tool belongs to no one
+            if (item.TryGetComponent<Tool>(out Tool tool))
             {
-                GameObject item = inv.GetItem(selecItem);
-
-                // if Tool Remove Inventory, make sure the tool belongs to no one
-                if (item.TryGetComponent<Tool>(out Tool tool))
+                if (tool.inv != null)
                 {
-                    if (tool.inv != null)
-                    {
-                        tool.inv = null;
-                    }
-                }
-
-                inv.RemoveItem(item);
-                UpdateHeldItem();
-
-                item.SetActive(true);
-                item.transform.SetParent(null);
-                if (item.TryGetComponent<Rigidbody>(out Rigidbody rb))
-                {
-                    rb.useGravity = true;
-                    rb.detectCollisions = true;
-                    rb.isKinematic = false;
-                    rb.AddForce(forward.normalized * 10, ForceMode.Impulse);
+                    tool.inv = null;
                 }
             }
+
+            inv.RemoveItem(item);
+            UpdateHeldItem();
+
+            item.SetActive(true);
+            item.transform.SetParent(null);
+
+            // If has a rb, launch
+            if (item.TryGetComponent<Rigidbody>(out Rigidbody rb))
+            {
+                rb.useGravity = true;
+                rb.detectCollisions = true;
+                rb.isKinematic = false;
+                rb.AddForce(forward.normalized * 10, ForceMode.Impulse);
+            }
+            
         }
     }
 
@@ -119,6 +117,7 @@ public class Interactions : MonoBehaviour
     {
         int maxItems = inv.GetAllItems().Count;
 
+        // Make sure selected Item doesn't go out of bounds
         if (selecItem < 0)
         {
             if (maxItems != 0)
@@ -131,9 +130,10 @@ public class Interactions : MonoBehaviour
             selecItem = 0;
         }
 
-        //print(selecItem);
+        // If there are still Items, switch to new Item
         if (maxItems > 0)
         {
+            // Make sure Items aren't active
             foreach (var other in inv.GetAllItems())
             {
                 other.SetActive(false);
@@ -141,13 +141,16 @@ public class Interactions : MonoBehaviour
 
             GameObject item = inv.GetItem(selecItem);
 
+            // Switch Item to hand
             item.SetActive(true);
+            
             if (item.TryGetComponent<Rigidbody>(out Rigidbody rb))
             {
                 rb.useGravity = false;
                 rb.detectCollisions = false;
                 rb.isKinematic = true;
             }
+
             item.transform.SetParent(hand.transform, true);
             item.transform.rotation = hand.transform.rotation;
             item.transform.position = hand.transform.position;
@@ -159,7 +162,7 @@ public class Interactions : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0) && !inv.isEmpty())
         {
             GameObject item = inv.GetItem(selecItem);
-            //get ToolScript
+            //get Tool Script
             //Detect if something is being hit
             RaycastHit hit;
             if (item.CompareTag("Tool") && item.TryGetComponent<Tool>(out Tool tool) && Physics.Raycast(transform.position, forward, out hit, interactDistance))
@@ -173,7 +176,7 @@ public class Interactions : MonoBehaviour
                 tool.DamageTool();
 
                 //Used Tool
-                print("used tool");
+                //print("used tool");
             }
         }
     }
