@@ -8,6 +8,7 @@ public class TerrainManager : MonoBehaviour
     public float flatPointsHeight;
     public Vector2 offset;
     public bool useCustomOffset;
+    public GameObject treeParent;
 
     // Set the dimensions of the terrain
     public int width = 256;
@@ -19,9 +20,8 @@ public class TerrainManager : MonoBehaviour
     void Start()
     {
         // Call the terrain generation function when the script starts
-        //GenerateTerrain();
         GenerateTerrain();
-        //InvokeRepeating("AddTrees", 1f, 2f);
+        //InvokeRepeating("GenerateTerrain", 1f, 2f);
     }
 
     private void Update() {
@@ -31,13 +31,13 @@ public class TerrainManager : MonoBehaviour
 
     void AddTree(Vector3 treeSpot)
     {
-        float ran = Random.Range(0, 1000);
+        float ran = Random.Range(0, 500);
         if(ran <= 1)
         {
             Terrain terrain = GetComponent<Terrain>();
             TreeInstance tree = new TreeInstance();
             tree.position = new Vector3(treeSpot.x / width, 0, treeSpot.z / height);
-            tree.prototypeIndex = Random.Range(0, 2);
+            tree.prototypeIndex = Random.Range(0, 8);
             tree.widthScale = 1f;
             tree.heightScale = 1f;
             tree.color = Color.white;
@@ -51,13 +51,41 @@ public class TerrainManager : MonoBehaviour
     {
         Terrain terrain = GetComponent<Terrain>();
 
-        // Generate the terrain and apply it to the Terrain component
+        // reset trees
+        terrain.terrainData.treeInstances = new TreeInstance[0];
+
+        // Generate the terrain
         terrain.terrainData = GenerateTerrain(terrain.terrainData);
+
+        // Convert Trees to actual trees
+        foreach (TreeInstance treeInstance in terrain.terrainData.treeInstances)
+        {
+            // Get the position in world space
+            Vector3 position = Vector3.Scale(treeInstance.position, terrain.terrainData.size) + terrain.transform.position;
+
+            // Get the original tree prototype index
+            int treePrototypeIndex = treeInstance.prototypeIndex;
+            
+            GameObject treePrefab = terrain.terrainData.treePrototypes[treePrototypeIndex].prefab;
+            
+            // Actual Tree
+            GameObject treeGameObject = Instantiate(treePrefab, position, Quaternion.identity);
+
+            treeGameObject.transform.SetParent(treeParent.transform);
+            treeGameObject.transform.localScale = new Vector3(2,2,2);
+
+            terrain.terrainData.treeInstances = new TreeInstance[0];
+        }
+
+        /*
+        // make trees collide
+        terrain.GetComponent<Collider>().enabled = false;
+        terrain.GetComponent<Collider>().enabled = true;*/
     }
 
     TerrainData GenerateTerrain(TerrainData terrainData)
     {
-        // Set the resolution and size of the terrain
+        // Set the resolution and size
         terrainData.heightmapResolution = width + 1;
         terrainData.size = new Vector3(width, 20, height);
 

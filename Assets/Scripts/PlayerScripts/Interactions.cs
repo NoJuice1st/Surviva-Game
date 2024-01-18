@@ -9,6 +9,7 @@ public class Interactions : MonoBehaviour
     public float interactDistance = 1f;
     public int selecItem = 0;
 
+    public Animator animator;
     public Transform hand;
     public Inventory inv;
 
@@ -152,8 +153,20 @@ public class Interactions : MonoBehaviour
             }
 
             item.transform.SetParent(hand.transform, true);
-            item.transform.rotation = hand.transform.rotation;
+
+            item.transform.rotation = new Quaternion();
+            
             item.transform.position = hand.transform.position;
+
+            if (item.TryGetComponent<Tool>(out Tool tool))
+            {
+                //print("picked up");
+                item.transform.localRotation = Quaternion.Euler(0, 100, 0);
+                if (item.TryGetComponent<Pickaxe>(out Pickaxe pickaxe))
+                {
+                    item.transform.position += new Vector3(0, 0.25f, 0);
+                }
+            }
         }
     }
 
@@ -165,18 +178,38 @@ public class Interactions : MonoBehaviour
             //get Tool Script
             //Detect if something is being hit
             RaycastHit hit;
-            if (item.CompareTag("Tool") && item.TryGetComponent<Tool>(out Tool tool) && Physics.Raycast(transform.position, forward, out hit, interactDistance))
+            if(animator.GetCurrentAnimatorStateInfo(0).length < animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
             {
-                //Get which tool hit
-                if (item.TryGetComponent<Axe>(out Axe axe))
+                if (item.CompareTag("Tool") && item.TryGetComponent<Tool>(out Tool tool) && Physics.Raycast(transform.position, forward, out hit, interactDistance))
                 {
-                    axe.useTool(hit);
+                    
+                    //Get which tool hit
+                    if (item.TryGetComponent<Axe>(out Axe axe))
+                    {
+                        axe.useTool(hit);
+                        animator.Play("SwingSideways");
+                    }
+                    else if (item.TryGetComponent<Pickaxe>(out Pickaxe pickaxe))
+                    {
+                        pickaxe.useTool(hit);
+                        animator.Play("SwingDown");
+                    }
+
+                    tool.DamageTool();
                 }
-
-                tool.DamageTool();
-
-                //Used Tool
-                //print("used tool");
+                else if(item.CompareTag("Tool") && item.TryGetComponent<Tool>(out Tool tools))
+                {
+                    //Get which tool to animate if not hit anything
+                    if (item.TryGetComponent<Axe>(out Axe axe))
+                    {
+                        animator.Play("SwingSideways");
+                    }
+                    else if (item.TryGetComponent<Pickaxe>(out Pickaxe pickaxe))
+                    {
+                        print(animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
+                        animator.Play("SwingDown");
+                    }
+                }
             }
         }
     }

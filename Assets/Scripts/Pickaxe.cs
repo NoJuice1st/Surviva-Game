@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Axe : MonoBehaviour
+public class Pickaxe : MonoBehaviour
 {
     public Tool tool;
     public int damage;
@@ -10,10 +10,10 @@ public class Axe : MonoBehaviour
     public void useTool(RaycastHit hit)
     {
         //print("Tool used");
-        if (hit.transform.gameObject.CompareTag("Tree"))
+        if (hit.transform.gameObject.CompareTag("Rock"))
         {
-            Destructable tree = hit.transform.gameObject.GetComponent<Destructable>();
-            tree.TakeDamage(damage);
+            Destructable rock = hit.transform.gameObject.GetComponent<Destructable>();
+            rock.TakeDamage(damage);
         }
     }
 }
