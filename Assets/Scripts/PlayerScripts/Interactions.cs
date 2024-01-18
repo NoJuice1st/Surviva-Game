@@ -12,6 +12,7 @@ public class Interactions : MonoBehaviour
     public Animator animator;
     public Transform hand;
     public Inventory inv;
+    public GameObject particleSys;
 
     Vector3 forward;
 
@@ -164,7 +165,7 @@ public class Interactions : MonoBehaviour
                 item.transform.localRotation = Quaternion.Euler(0, 100, 0);
                 if (item.TryGetComponent<Pickaxe>(out Pickaxe pickaxe))
                 {
-                    item.transform.position += new Vector3(0, 0.25f, 0);
+                    item.transform.position += hand.transform.up * 0.5f;
                 }
             }
         }
@@ -172,7 +173,7 @@ public class Interactions : MonoBehaviour
 
     private void Interact()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0) && !inv.isEmpty())
+        if (Input.GetKey(KeyCode.Mouse0) && !inv.isEmpty())
         {
             GameObject item = inv.GetItem(selecItem);
             //get Tool Script
@@ -195,6 +196,8 @@ public class Interactions : MonoBehaviour
                         animator.Play("SwingDown");
                     }
 
+                    HitParticles(hit);
+
                     tool.DamageTool();
                 }
                 else if(item.CompareTag("Tool") && item.TryGetComponent<Tool>(out Tool tools))
@@ -212,5 +215,15 @@ public class Interactions : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void HitParticles(RaycastHit hit)
+    {
+        
+        GameObject particles = Instantiate(particleSys, hit.point, hit.transform.rotation, null);
+        particles.GetComponent<Renderer>().material.color = hit.transform.GetComponent<Renderer>().material.color;
+
+        ParticleSystem ps = particles.GetComponent<ParticleSystem>();
+        ps.Play();
     }
 }

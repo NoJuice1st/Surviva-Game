@@ -120,11 +120,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropLoot: 1
+  dropOnHit: 0
   randomiseLootAmt: 1
-  randomLootRange: {x: 1, y: 2}
+  randomLootRange: {x: 1, y: 3}
   health: 5
   lootAmount: 1
-  lootDrop: {fileID: 4557194399434270742, guid: d4447035899d53f499c14eabd870c68c, type: 3}
+  onHitLootAmt: 0
+  lootDrop: {fileID: 8846148931191284412, guid: 59dd28c00cd03a847a22e1958665152d, type: 3}
 --- !u!205 &7128406209172876160
 LODGroup:
   m_ObjectHideFlags: 0

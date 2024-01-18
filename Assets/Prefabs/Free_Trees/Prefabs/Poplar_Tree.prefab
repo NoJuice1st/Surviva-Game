@@ -100,11 +100,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropLoot: 1
+  dropOnHit: 0
   randomiseLootAmt: 1
-  randomLootRange: {x: 1, y: 2}
+  randomLootRange: {x: 1, y: 3}
   health: 5
   lootAmount: 1
-  lootDrop: {fileID: 0}
+  onHitLootAmt: 0
+  lootDrop: {fileID: 8846148931191284412, guid: 59dd28c00cd03a847a22e1958665152d, type: 3}
 --- !u!65 &2163491869759244181
 BoxCollider:
   m_ObjectHideFlags: 0
