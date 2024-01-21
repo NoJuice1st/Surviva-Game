@@ -147,5 +147,5 @@ MonoBehaviour:
   animator: {fileID: 0}
   surface: {fileID: 0}
   speed: 0
-  viewDistance: 65
+  viewDistance: 220
   wanderDistance: 20

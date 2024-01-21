@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Campfire : MonoBehaviour
 {
@@ -56,7 +57,8 @@ public class Campfire : MonoBehaviour
         }
         else
         {
-            print("OH OH");
+            SceneManager.LoadScene("MainMenu");
+            Cursor.lockState = CursorLockMode.Confined;
         }
     }
 }
