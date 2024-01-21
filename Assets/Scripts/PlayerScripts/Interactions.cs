@@ -14,6 +14,13 @@ public class Interactions : MonoBehaviour
     public Inventory inv;
     public GameObject particleSys;
 
+    public AudioSource audioSource;
+    public AudioClip woodSound;
+    public AudioClip rockSound;
+    public AudioClip whoosh;
+
+
+
     Vector3 forward;
 
     private void Update()
@@ -187,15 +194,18 @@ public class Interactions : MonoBehaviour
                     //Get which tool hit
                     if (item.TryGetComponent<Axe>(out Axe axe))
                     {
+                        audioSource.PlayOneShot(woodSound);
                         axe.useTool(hit);
                         animator.Play("SwingSideways");
                     }
                     else if (item.TryGetComponent<Pickaxe>(out Pickaxe pickaxe))
                     {
+                        audioSource.PlayOneShot(rockSound);
                         pickaxe.useTool(hit);
                         animator.Play("SwingDown");
                     }
 
+                    audioSource.PlayOneShot(whoosh);
                     HitParticles(hit);
 
                     tool.DamageTool();
@@ -212,6 +222,7 @@ public class Interactions : MonoBehaviour
                         print(animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
                         animator.Play("SwingDown");
                     }
+                    audioSource.PlayOneShot(whoosh);
                 }
             }
         }

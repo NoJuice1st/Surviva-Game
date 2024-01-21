@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class SaleManager : MonoBehaviour
 {
     public float currency;
+    public TMP_Text curText;
 
     private void OnCollisionEnter(Collision other) 
     {
@@ -18,6 +20,6 @@ public class SaleManager : MonoBehaviour
 
     private void Update() 
     {
-        print(currency);
+        curText.text = "Money: " + currency.ToString();
     }
 }

@@ -5,8 +5,10 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public MonsterManager monsterMan;
+    public int currentDay;
+    public TerrainManager tm;
 
-    // Start is called before the first frame update
     void Start()
     {
         if (instance == null)
@@ -18,11 +20,32 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        tm.GenerateTerrain();
     }
 
-    // Update is called once per frame
-    void Update()
+    
+
+    public void SetCurrentDay(int day)
     {
-        
+        currentDay = day;
+        tm.GenerateTerrain();
+    }
+
+    public void NightTime(bool isNight)
+    {
+        if(!monsterMan.MonsterCheck())
+        {
+            if(isNight)
+            {
+                monsterMan.SpawnMonster();
+            }
+        }
+        else
+        {
+            if(!isNight)
+            {
+                monsterMan.RemoveMonster();
+            }
+        }
     }
 }

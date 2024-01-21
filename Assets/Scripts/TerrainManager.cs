@@ -2,13 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class TerrainManager : MonoBehaviour
 {
-    public Vector2 flatPoints; // min / max
-    public float flatPointsHeight;
     public Vector2 offset;
     public bool useCustomOffset;
     public GameObject treeParent;
+    public bool regenFlatArea;
+    public ParticleSystem ps;
+
+    //Flat Area
+    public float flatPointsHeight;
+    public Vector2 circleCenter = new Vector2(125, 125);
+    public float circleRadius = 25f;
+    public float blendWidth = 10f;
 
     // Set the dimensions of the terrain
     public int width = 256;
@@ -17,21 +24,9 @@ public class TerrainManager : MonoBehaviour
     // Set the scale 
     public float scale = 20f;
 
-    void Start()
-    {
-        // Call the terrain generation function when the script starts
-        GenerateTerrain();
-        //InvokeRepeating("GenerateTerrain", 1f, 2f);
-    }
-
-    private void Update() {
-        //GenerateTerrain();
-        //offset.x += Time.deltaTime;
-    }
-
     void AddTree(Vector3 treeSpot)
     {
-        float ran = Random.Range(0, 500);
+        float ran = Random.Range(0, 300);
         if(ran <= 1)
         {
             Terrain terrain = GetComponent<Terrain>();
@@ -47,12 +42,15 @@ public class TerrainManager : MonoBehaviour
         }
     }
 
-    void GenerateTerrain()
+    public void GenerateTerrain()
     {
         Terrain terrain = GetComponent<Terrain>();
 
         // reset trees
-        terrain.terrainData.treeInstances = new TreeInstance[0];
+        foreach (Transform child in treeParent.transform)
+        {
+            Destroy(child.gameObject);
+        }
 
         // Generate the terrain
         terrain.terrainData = GenerateTerrain(terrain.terrainData);
@@ -77,6 +75,7 @@ public class TerrainManager : MonoBehaviour
             terrain.terrainData.treeInstances = new TreeInstance[0];
         }
 
+        ps.Play();
         /*
         // make trees collide
         terrain.GetComponent<Collider>().enabled = false;
@@ -98,7 +97,7 @@ public class TerrainManager : MonoBehaviour
     float[,] GenerateHeights()
     {
         float[,] heights = new float[width, height];
-    
+
         // Use offset to make the terrain unique each time
 
         if(!useCustomOffset)
@@ -113,10 +112,20 @@ public class TerrainManager : MonoBehaviour
             {
 
                 // Define the flat area
-                if (x >= flatPoints.x && x <= flatPoints.y && y >= flatPoints.x && y <= flatPoints.y)
+                // Calculate the distance from the current point to the center of the circle
+                float distanceToCenter = Vector2.Distance(new Vector2(x, y), circleCenter);
+
+                // Define the flat area as a circle
+                if (distanceToCenter <= circleRadius)
                 {
-                    // Set the height to a constant value 0-1
-                    heights[x, y] = flatPointsHeight;
+                    if (regenFlatArea)
+                    {
+                        // Calculate a blend factor based on the distance to create a smooth transition
+                        float blendFactor = Mathf.Clamp01((distanceToCenter - (circleRadius - blendWidth)) / blendWidth);
+
+                        // Set the height to a constant value with a smooth blend
+                        heights[x, y] = Mathf.Lerp(flatPointsHeight,  Mathf.PerlinNoise((float)x / width * scale + offset.x, (float)y / height * scale + offset.y), blendFactor);
+                    }
                 }
                 else
                 {
